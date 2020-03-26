@@ -93,55 +93,60 @@ async def on_message(message):
             for user in courreur["votes"]:
                 usersList += user.name + ", "
             await message.channel.send("{} a.ont parié.e.s pour {}".format(usersList, courreur["reaction"].emoji))
-        # affichage de la course
-        await message.channel.send("---------------------- Debut de la course ----------------------")
-        for courreur in courreurs:            
-            courreur["course"] = await message.channel.send(':triangular_flag_on_post:' + courreur["avance"] * " " + courreur["reaction"].emoji + (RACE_LENGTH - courreur["avance"]) * " " + ":checkered_flag:")
             
-        # on fait la course !!!
-        while True:
-            # on avance un courreur random
-            courreur = courreurs[random.randint(0, len(courreurs) - 1)]
-            currentCourse = courreur["course"]
-            courreur["avance"] += random.randint(1, 10)
-            if (courreur["avance"] >= RACE_LENGTH):
-                await message.channel.send("---------------------- Fin de la course ----------------------")
-                strCourseFin = ":triangular_flag_on_post:" + RACE_LENGTH * " " + ":checkered_flag:" + courreur["reaction"].emoji
-                await currentCourse.edit(content=strCourseFin)
-                break
-            strCourse = ":triangular_flag_on_post:" + courreur["avance"] * " " + courreur["reaction"].emoji + (RACE_LENGTH - courreur["avance"]) * " " + ":checkered_flag:"
-            await currentCourse.edit(content=strCourse)
-            sleep(random.random() * 0.3 + 0.1)
-
-        podium = sorted(courreurs, key=lambda i: i["avance"], reverse=True)
-
-        # update en meme temps dans la base de donnée 
+        # affichage de la course
         try:
-            await message.channel.send(":first_place: " + podium[0]["reaction"].emoji)
-            for parieur in podium[0]["votes"]:
-                c.execute(f'INSERT OR IGNORE INTO users VALUES ({parieur.id}, "{parieur.name}", 0, 0, 0);')
-                c.execute(f'UPDATE users SET balance = balance +  50, nbBets = nbBets + 1 WHERE id LIKE {parieur.id};')
-                await message.channel.send(f'{parieur.name} a gagné 50 tc-dollars')
+            await message.channel.send("---------------------- Debut de la course ----------------------")
+            for courreur in courreurs:            
+                courreur["course"] = await message.channel.send(':triangular_flag_on_post:' + courreur["avance"] * " " + courreur["reaction"].emoji + (RACE_LENGTH - courreur["avance"]) * " " + ":checkered_flag:")
 
-            await message.channel.send(":second_place: " + podium[1]["reaction"].emoji)
-            for parieur in podium[1]["votes"]:
-                c.execute(f'INSERT OR IGNORE INTO users VALUES ({parieur.id}, "{parieur.name}", 0, 0, 0);')
-                c.execute(f'UPDATE users SET balance = balance +  40, nbBets = nbBets + 1 WHERE id LIKE {parieur.id};')
-                await message.channel.send(f'{parieur.name} a gagné 40 tc-dollars')
+            # on fait la course !!!
+            while True:
+                # on avance un courreur random
+                courreur = courreurs[random.randint(0, len(courreurs) - 1)]
+                currentCourse = courreur["course"]
+                courreur["avance"] += random.randint(1, 10)
+                if (courreur["avance"] >= RACE_LENGTH):
+                    await message.channel.send("---------------------- Fin de la course ----------------------")
+                    strCourseFin = ":triangular_flag_on_post:" + RACE_LENGTH * " " + ":checkered_flag:" + courreur["reaction"].emoji
+                    await currentCourse.edit(content=strCourseFin)
+                    break
+                strCourse = ":triangular_flag_on_post:" + courreur["avance"] * " " + courreur["reaction"].emoji + (RACE_LENGTH - courreur["avance"]) * " " + ":checkered_flag:"
+                await currentCourse.edit(content=strCourse)
+                sleep(random.random() * 0.3 + 0.1)
 
-            await message.channel.send(":third_place: " + podium[2]["reaction"].emoji)
-            for parieur in podium[2]["votes"]:
-                c.execute(f'INSERT OR IGNORE INTO users VALUES ({parieur.id}, "{parieur.name}", 0, 0, 0);')
-                c.execute(f'UPDATE users SET balance = balance +  30, nbBets = nbBets + 1 WHERE id LIKE {parieur.id};')
-                await message.channel.send(f'{parieur.name} a gagné 30 tc-dollar')
-        
-        finally:
-            conn.commit() # udpate the changes in db
-            state = 0 # back to normal state
-            # clear  variables
-            messages = {}
-            courreurs = []
-            parieurs = []
+            podium = sorted(courreurs, key=lambda i: i["avance"], reverse=True)
+
+            # update en meme temps dans la base de donnée 
+            try:
+                await message.channel.send(":first_place: " + podium[0]["reaction"].emoji)
+                for parieur in podium[0]["votes"]:
+                    c.execute(f'INSERT OR IGNORE INTO users VALUES ({parieur.id}, "{parieur.name}", 0, 0, 0);')
+                    c.execute(f'UPDATE users SET balance = balance +  50, nbBets = nbBets + 1 WHERE id LIKE {parieur.id};')
+                    await message.channel.send(f'{parieur.name} a gagné 50 tc-dollars')
+
+                await message.channel.send(":second_place: " + podium[1]["reaction"].emoji)
+                for parieur in podium[1]["votes"]:
+                    c.execute(f'INSERT OR IGNORE INTO users VALUES ({parieur.id}, "{parieur.name}", 0, 0, 0);')
+                    c.execute(f'UPDATE users SET balance = balance +  40, nbBets = nbBets + 1 WHERE id LIKE {parieur.id};')
+                    await message.channel.send(f'{parieur.name} a gagné 40 tc-dollars')
+
+                await message.channel.send(":third_place: " + podium[2]["reaction"].emoji)
+                for parieur in podium[2]["votes"]:
+                    c.execute(f'INSERT OR IGNORE INTO users VALUES ({parieur.id}, "{parieur.name}", 0, 0, 0);')
+                    c.execute(f'UPDATE users SET balance = balance +  30, nbBets = nbBets + 1 WHERE id LIKE {parieur.id};')
+                    await message.channel.send(f'{parieur.name} a gagné 30 tc-dollar')
+
+            finally:
+                conn.commit() # udpate the changes in db
+                state = 0 # back to normal state
+                # clear  variables
+                messages = {}
+                courreurs = []
+                parieurs = []
+        except:
+            await message.channel.send("Course annulé, uniquement des emoji")
+            state = 0          
 
 
     elif(message.content == "$richiestboard" and state == 0 and not message.author.bot):
