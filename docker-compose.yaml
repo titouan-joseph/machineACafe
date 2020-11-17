@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  bot:
+    image: 127.0.0.1:5000/machineacafe
+    env_file:
+      - .env
+    build: .
+    volumes:
+    - ./deploy:/bot/database

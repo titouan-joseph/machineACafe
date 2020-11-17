@@ -4,19 +4,19 @@ import re
 import random
 
 import discord
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from time import sleep
 import sqlite3
 
 RACE_LENGTH = 150
 
 # connecting to the sqlite3 database to store players score
-conn = sqlite3.connect("users.db")
+conn = sqlite3.connect("database/users.db")
 c = conn.cursor()
 # init db
 c.execute('CREATE TABLE IF NOT EXISTS users (id INTEGER, name TEXT, balance INTEGER, nbBets INTEGER DEFAULT 0, nbCafe INTEGER DEFAULT 0, PRIMARY KEY(id));')
 
-load_dotenv()
+# load_dotenv()
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 
