@@ -145,9 +145,10 @@ async def on_message(message):
 
 
     elif(message.content == "$richiestboard" and state == 0 and not message.author.bot):
-        await message.channel.send(":first_place: ---- Richiestboard ---- :first_place:")
+        msg = ":first_place: ---- Richiestboard ---- :first_place: \n"
         for index, row in enumerate(c.execute('SELECT * FROM users ORDER BY balance DESC LIMIT 10')):
-            await message.channel.send(f'{index + 1} --- {row[1]} avec {row[2]} tc-dollars')
+            msg += f'{index + 1} --- {row[1]} avec {row[2]} tc-dollars \n'
+        await message.channel.send(msg)
 
     elif(message.content == "$myscore" and state == 0 and not message.author.bot):
         c.execute(f'SELECT * FROM users WHERE id={message.author.id}')
